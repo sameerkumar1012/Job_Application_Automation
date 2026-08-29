@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Settings - Job Apply Copilot{% endblock %}
+{% block content %}
+  <h1>Settings</h1>
+
+  {% if not nemotron_configured %}
+    <div class="banner banner-warn">
+      No NVIDIA API key set. Add <code>NVIDIA_API_KEY=...</code> to the <code>.env</code>
+      file at the project root and restart <code>python run.py</code>. The model name
+      below is stored separately and can be changed any time.
+    </div>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('ui.settings_save') }}">
+    <label for="model">Nemotron model</label>
+    <input type="text" id="model" name="model" value="{{ settings.model }}">
+
+    <label class="checkbox-row">
+      <input type="checkbox" name="auto_advance_steps" value="yes" {% if settings.auto_advance_steps %}checked{% endif %}>
+      Auto-advance through multi-step wizards (never auto-submits the final page)
+    </label>
+
+    <button type="submit" class="button">Save settings</button>
+  </form>
+{% endblock %}

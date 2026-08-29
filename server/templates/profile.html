@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}Profile - Job Apply Copilot{% endblock %}
+{% block content %}
+  <h1>Profile</h1>
+  <form method="post" action="{{ url_for('ui.profile_save') }}">
+
+    <fieldset>
+      <legend>Basics</legend>
+      <label for="full_name">Full name</label>
+      <input type="text" id="full_name" name="full_name" value="{{ profile.full_name }}">
+
+      <label for="preferred_name">Preferred name</label>
+      <input type="text" id="preferred_name" name="preferred_name" value="{{ profile.preferred_name or '' }}">
+
+      <label for="pronouns">Pronouns</label>
+      <input type="text" id="pronouns" name="pronouns" value="{{ profile.pronouns or '' }}">
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" value="{{ profile.email }}">
+
+      <label for="phone">Phone</label>
+      <input type="text" id="phone" name="phone" value="{{ profile.phone or '' }}">
+
+      <label for="location">Location</label>
+      <input type="text" id="location" name="location" value="{{ profile.location or '' }}">
+    </fieldset>
+
+    <fieldset>
+      <legend>Links</legend>
+      <label for="linkedin">LinkedIn</label>
+      <input type="text" id="linkedin" name="linkedin" value="{{ profile.links.linkedin or '' }}">
+      <label for="github">GitHub</label>
+      <input type="text" id="github" name="github" value="{{ profile.links.github or '' }}">
+      <label for="portfolio">Portfolio</label>
+      <input type="text" id="portfolio" name="portfolio" value="{{ profile.links.portfolio or '' }}">
+      <label for="other_link">Other</label>
+      <input type="text" id="other_link" name="other_link" value="{{ profile.links.other or '' }}">
+    </fieldset>
+
+    <fieldset>
+      <legend>Work experience</legend>
+      <div id="work-rows">
+        {% for w in profile.work_experience %}
+          <div class="repeat-row">
+            <input type="text" name="work_company[]" placeholder="Company" value="{{ w.company }}">
+            <input type="text" name="work_title[]" placeholder="Title" value="{{ w.title }}">
+            <input type="text" name="work_location[]" placeholder="Location" value="{{ w.location or '' }}">
+            <input type="text" name="work_start[]" placeholder="YYYY-MM" value="{{ w.start_date }}">
+            <input type="text" name="work_end[]" placeholder="YYYY-MM" value="{{ w.end_date or '' }}">
+            <select name="work_current[]">
+              <option value="no" {% if not w.current %}selected{% endif %}>Not current</option>
+              <option value="yes" {% if w.current %}selected{% endif %}>Current</option>
+            </select>
+            <textarea name="work_description[]" placeholder="Description">{{ w.description or '' }}</textarea>
+            <button type="button" class="button-secondary" onclick="this.parentElement.remove()">Remove</button>
+          </div>
+        {% endfor %}
+      </div>
+      <button type="button" class="button-secondary" id="add-work-row">+ Add work experience</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>Education</legend>
+      <div id="edu-rows">
+        {% for e in profile.education %}
+          <div class="repeat-row">
+            <input type="text" name="edu_school[]" placeholder="School" value="{{ e.school }}">
+            <input type="text" name="edu_degree[]" placeholder="Degree" value="{{ e.degree or '' }}">
+            <input type="text" name="edu_field[]" placeholder="Field of study" value="{{ e.field_of_study or '' }}">
+            <input type="text" name="edu_start[]" placeholder="Start" value="{{ e.start_date or '' }}">
+            <input type="text" name="edu_end[]" placeholder="End" value="{{ e.end_date or '' }}">
+            <input type="text" name="edu_gpa[]" placeholder="GPA" value="{{ e.gpa or '' }}">
+            <button type="button" class="button-secondary" onclick="this.parentElement.remove()">Remove</button>
+          </div>
+        {% endfor %}
+      </div>
+      <button type="button" class="button-secondary" id="add-edu-row">+ Add education</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>Skills</legend>
+      <label for="skills">Comma-separated</label>
+      <textarea id="skills" name="skills">{{ profile.skills|join(", ") }}</textarea>
+    </fieldset>
+
+    <fieldset>
+      <legend>Work authorization</legend>
+      <label class="checkbox-row">
+        <input type="checkbox" name="authorized_to_work" value="yes"
+          {% if profile.work_authorization and profile.work_authorization.authorized_to_work_in_country %}checked{% endif %}>
+        Authorized to work in my country
+      </label>
+      <label class="checkbox-row">
+        <input type="checkbox" name="requires_sponsorship_now" value="yes"
+          {% if profile.work_authorization and profile.work_authorization.requires_sponsorship_now %}checked{% endif %}>
+        Requires sponsorship now
+      </label>
+      <label class="checkbox-row">
+        <input type="checkbox" name="requires_sponsorship_future" value="yes"
+          {% if profile.work_authorization and profile.work_authorization.requires_sponsorship_future %}checked{% endif %}>
+        Will require sponsorship in the future
+      </label>
+      <label for="work_auth_country">Country</label>
+      <input type="text" id="work_auth_country" name="work_auth_country"
+        value="{{ profile.work_authorization.country if profile.work_authorization else '' }}">
+    </fieldset>
+
+    <fieldset>
+      <legend>EEO / voluntary self-identification</legend>
+      <label class="checkbox-row">
+        <input type="checkbox" name="want_to_self_identify" value="yes"
+          {% if profile.eeo and profile.eeo.want_to_self_identify %}checked{% endif %}>
+        I want to voluntarily disclose EEO information (otherwise "decline to answer" is preferred on forms)
+      </label>
+      <label for="eeo_gender">Gender</label>
+      <input type="text" id="eeo_gender" name="eeo_gender" value="{{ profile.eeo.gender if profile.eeo else '' }}">
+      <label for="eeo_race">Race/ethnicity</label>
+      <input type="text" id="eeo_race" name="eeo_race" value="{{ profile.eeo.race if profile.eeo else '' }}">
+      <label for="eeo_veteran">Veteran status</label>
+      <input type="text" id="eeo_veteran" name="eeo_veteran" value="{{ profile.eeo.veteran_status if profile.eeo else '' }}">
+      <label for="eeo_disability">Disability status</label>
+      <input type="text" id="eeo_disability" name="eeo_disability" value="{{ profile.eeo.disability_status if profile.eeo else '' }}">
+    </fieldset>
+
+    <fieldset>
+      <legend>Salary expectations</legend>
+      <label for="salary_min">Minimum</label>
+      <input type="number" id="salary_min" name="salary_min" value="{{ profile.desired_salary_min or '' }}">
+      <label for="salary_max">Maximum</label>
+      <input type="number" id="salary_max" name="salary_max" value="{{ profile.desired_salary_max or '' }}">
+      <label for="salary_currency">Currency</label>
+      <input type="text" id="salary_currency" name="salary_currency" value="{{ profile.salary_currency or '' }}">
+    </fieldset>
+
+    {% if profile.saved_answers %}
+    <fieldset>
+      <legend>Saved answers (reused for recurring questions)</legend>
+      {% for signature, answer in profile.saved_answers.items() %}
+        <div class="repeat-row">
+          <label>{{ signature }}</label>
+          <textarea name="saved_answer__{{ signature }}">{{ answer }}</textarea>
+          <label class="checkbox-row">
+            <input type="checkbox" name="delete_answer__{{ signature }}" value="yes"> Delete
+          </label>
+        </div>
+      {% endfor %}
+    </fieldset>
+    {% endif %}
+
+    <button type="submit" class="button">Save profile</button>
+  </form>
+
+  <script>
+    function addRow(containerId, html) {
+      const container = document.getElementById(containerId);
+      const div = document.createElement("div");
+      div.className = "repeat-row";
+      div.innerHTML = html;
+      container.appendChild(div);
+    }
+    document.getElementById("add-work-row").addEventListener("click", function () {
+      addRow("work-rows",
+        '<input type="text" name="work_company[]" placeholder="Company">' +
+        '<input type="text" name="work_title[]" placeholder="Title">' +
+        '<input type="text" name="work_location[]" placeholder="Location">' +
+        '<input type="text" name="work_start[]" placeholder="YYYY-MM">' +
+        '<input type="text" name="work_end[]" placeholder="YYYY-MM">' +
+        '<select name="work_current[]"><option value="no">Not current</option><option value="yes">Current</option></select>' +
+        '<textarea name="work_description[]" placeholder="Description"></textarea>' +
+        '<button type="button" class="button-secondary" onclick="this.parentElement.remove()">Remove</button>');
+    });
+    document.getElementById("add-edu-row").addEventListener("click", function () {
+      addRow("edu-rows",
+        '<input type="text" name="edu_school[]" placeholder="School">' +
+        '<input type="text" name="edu_degree[]" placeholder="Degree">' +
+        '<input type="text" name="edu_field[]" placeholder="Field of study">' +
+        '<input type="text" name="edu_start[]" placeholder="Start">' +
+        '<input type="text" name="edu_end[]" placeholder="End">' +
+        '<input type="text" name="edu_gpa[]" placeholder="GPA">' +
+        '<button type="button" class="button-secondary" onclick="this.parentElement.remove()">Remove</button>');
+    });
+  </script>
+{% endblock %}

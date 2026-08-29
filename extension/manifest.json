@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Job Apply Copilot",
+  "description": "Fills job applications from your local profile using a local Python server + NVIDIA Nemotron. You review and submit -- it never submits for you.",
+  "version": "0.2.0",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": ["activeTab", "storage", "webNavigation"],
+  "host_permissions": ["http://127.0.0.1:8765/*", "<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ]
+}

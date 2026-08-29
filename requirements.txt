@@ -1,0 +1,8 @@
+flask
+flask-cors
+python-dotenv
+pydantic
+requests
+pypdf
+python-docx
+pytest

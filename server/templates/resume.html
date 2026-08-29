@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Resume - Job Apply Copilot{% endblock %}
+{% block content %}
+  <h1>Resume</h1>
+
+  {% if error %}
+    <div class="banner banner-warn">{{ error }}</div>
+  {% endif %}
+
+  {% if profile.resume_file_name %}
+    <p>Currently uploaded: <strong>{{ profile.resume_file_name }}</strong></p>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('ui.resume_upload') }}" enctype="multipart/form-data">
+    <label for="resume_file">Upload resume (.pdf, .docx, or .txt)</label>
+    <input type="file" id="resume_file" name="resume_file" accept=".pdf,.docx,.txt,.md" required>
+    <button type="submit" class="button">Upload &amp; parse</button>
+  </form>
+
+  {% if profile.resume_text %}
+    <h2>Extracted text (preview)</h2>
+    <pre class="text-preview">{{ profile.resume_text[:2000] }}{% if profile.resume_text|length > 2000 %}...{% endif %}</pre>
+    <p><a href="{{ url_for('ui.profile_form') }}">Review the parsed profile fields &rarr;</a></p>
+  {% endif %}
+{% endblock %}

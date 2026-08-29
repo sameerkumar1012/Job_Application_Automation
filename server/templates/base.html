@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Job Apply Copilot{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="{{ url_for('ui.dashboard') }}">Job Apply Copilot</a>
+    <a href="{{ url_for('ui.dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('ui.profile_form') }}">Profile</a>
+    <a href="{{ url_for('ui.resume_form') }}">Resume</a>
+    <a href="{{ url_for('ui.settings_form') }}">Settings</a>
+  </nav>
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

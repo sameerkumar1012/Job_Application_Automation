@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Job Apply Copilot{% endblock %}
+{% block content %}
+  <h1>Dashboard</h1>
+
+  {% if not nemotron_configured %}
+    <div class="banner banner-warn">
+      No NVIDIA API key configured yet. Paste your key into the <code>NVIDIA_API_KEY</code>
+      line of the <code>.env</code> file at the project root, then restart the server.
+      Everything else (profile editing, resume text extraction) works without it.
+    </div>
+  {% else %}
+    <div class="banner banner-ok">NVIDIA Nemotron API key configured.</div>
+  {% endif %}
+
+  <div class="card-grid">
+    <div class="card">
+      <h2>Profile</h2>
+      <p><strong>{{ profile.full_name or "No name set" }}</strong></p>
+      <p>{{ profile.email or "No email set" }}</p>
+      <p>{{ profile.work_experience|length }} work entries, {{ profile.education|length }} education entries, {{ profile.skills|length }} skills</p>
+      <a class="button" href="{{ url_for('ui.profile_form') }}">Edit profile</a>
+    </div>
+
+    <div class="card">
+      <h2>Resume</h2>
+      {% if profile.resume_file_name %}
+        <p>Uploaded: <strong>{{ profile.resume_file_name }}</strong></p>
+      {% else %}
+        <p>No resume uploaded yet.</p>
+      {% endif %}
+      <a class="button" href="{{ url_for('ui.resume_form') }}">Upload / re-parse resume</a>
+    </div>
+
+    <div class="card">
+      <h2>Settings</h2>
+      <p>Model: <strong>{{ settings.model }}</strong></p>
+      <p>Auto-advance steps: <strong>{{ "On" if settings.auto_advance_steps else "Off" }}</strong></p>
+      <a class="button" href="{{ url_for('ui.settings_form') }}">Edit settings</a>
+    </div>
+  </div>
+
+  <h2>Using the extension</h2>
+  <p>Load the <code>extension/</code> folder as an unpacked extension in
+    <code>chrome://extensions</code> (enable Developer Mode first). Click the toolbar
+    icon on any job application page and press "Fill this page" -- it never submits
+    on its own, you always review and submit yourself.</p>
+{% endblock %}
